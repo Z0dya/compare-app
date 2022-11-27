@@ -4,13 +4,13 @@
 			<img src="../assets/ab-testing 1.svg" alt="compareLogo" />
 		</div>
 		<div class="btnBlock">
-			<input type="file" class="firstBtn" placeholder="Загрузить 1 файл" ref="input1" />
-			<input type="file" class="secondBtn" placeholder="Загрузить 2 файл" ref="input2" />
+			<input type="file" class="firstBtn" placeholder="Загрузить 1 файл" ref="file1" @change="upload1" :accept="AvailableFormats" />
+			<input type="file" class="secondBtn" placeholder="Загрузить 2 файл" ref="file2" @change="upload2" :accept="AvailableFormats" />
 		</div>
 
 		<div class="nextPage">
 			<router-link to="/comparing" class="nextLink">
-				<button class="nextBtn" ref="next">Далее</button>
+				<button class="nextBtn" ref="next" :disabled="nextBtn">Далее</button>
 			</router-link>
 		</div>
 		<div class="repos">
@@ -21,25 +21,78 @@
 </template>
 
 <script>
+import { read, utils } from 'xlsx';
+import { mapGetters } from 'vuex';
+
 export default {
 	name: 'App',
 	data: function () {
 		return {
-			nextBtn: this.$refs.next,
-			inputFile1: this.$refs.input1,
-			inputFile2: this.$refs.input2,
+			nextBtn: true,
+			AvailableFormats: ['.xlsx', '.xlsb', '.xlsm', '.xls'],
 		};
 	},
+	computed: mapGetters(['file1', 'file2']),
 	methods: {
 		checkedButton() {
-			if (this.inputFile1.value && this.inputFile2.value) {
-				this.nextBtnt.attributes('disabled', false);
+			if (this.$refs.file1.files[0] && this.$refs.file2.files[0]) {
+				this.nextBtn = false;
 			} else {
-				this.nextBtn.attributes('disabled', true);
+				this.nextBtn = true;
 			}
-			// :on-change="checkedButton()"
-			// disabled
 		},
+		upload1(event) {
+			this.readFile(event, 'file1');
+		},
+		upload2(event) {
+			this.readFile(event, 'file2');
+		},
+		async readFile(event, fileNumber) {
+			this.checkedButton();
+			const files = event.target.files;
+			// ловим все false, undefined и тд
+			if (!files || files.length == 0) return;
+			const file = files[0];
+
+			const reader = new FileReader();
+
+			reader.onload = (e) => {
+				// get data
+				const bytes = new Uint8Array(e.target.result);
+
+				/* read workbook */
+				const workbook = read(bytes);
+
+				/* grab first sheet */
+				const wsname = workbook.SheetNames[0];
+				const ws = workbook.Sheets[wsname];
+
+				/* generate HTML */
+				const rows = utils.sheet_to_json(ws);
+
+				this.postDataToVuex(fileNumber, rows);
+			};
+			reader.readAsArrayBuffer(file);
+		},
+		postDataToVuex(fileNumber, rows) {
+			// отправка данных в vuex (название мутации, объект с данными)
+			this.$store.commit('setFileData', {
+				fileNumber: fileNumber,
+				newFileData: {
+					file: this.$refs[fileNumber].files[0],
+					table: {
+						rows: rows,
+					},
+				},
+			});
+		},
+		vieiwic(rows) {
+			console.log(rows);
+		},
+	},
+	mounted: function () {
+		this.$refs.file1.name = this.file1.file;
+		this.$refs.file2.name = this.file2.file;
 	},
 };
 </script>
@@ -99,6 +152,9 @@ export default {
 		}
 		.nextBtn:hover {
 			background: rgba(43, 43, 43, 0.79);
+		}
+		.nextBtn:disabled {
+			background: rgba(43, 43, 43, 0.5);
 		}
 	}
 }
