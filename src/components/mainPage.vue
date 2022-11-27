@@ -14,7 +14,7 @@
 			</router-link>
 		</div>
 		<div class="repos">
-			<a href="https://github.com/Z0dya/compare-app"> <img src="../assets/Git (1).svg" alt="gitIco" class="git" /></a>
+			<a href="https://github.com/Z0dya/compare-app" target="_blank"> <img src="../assets/Git (1).svg" alt="gitIco" class="git" /></a>
 			<a href="#"> <img src="../assets/gitlab 1 (1).svg" alt="gitlabIco" class="gitlab" /></a>
 		</div>
 	</div>
