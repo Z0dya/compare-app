@@ -5,31 +5,20 @@
 		</div>
 		<div class="compareParam">
 			<div class="leftParams">
-				<h1>Excel file #1 ...</h1>
-				<select id="LeftSelect#1">
-					<option value="Unset">Не выбрано</option>
-					<option value="Unset">Нэма</option>
-				</select>
-				<select id="LeftSelect#2">
-					<option value="Unset">Не выбрано 2</option>
-					<option value="Unset">Пуста</option>
-				</select>
-				<select id="LeftSelect#3">
-					<option value="Unset">Не выбрано 3</option>
-					<option value="Unset">Хнык</option>
-				</select>
+				<h1>{{ file1.file.name }}</h1>
+				<create-selects
+					v-for="select in Object.keys(file1.table.rows[0])"
+					:options="Object.keys(file1.table.rows[0])"
+					v-bind:key="select"
+				></create-selects>
 			</div>
 			<div class="rightParams">
-				<h1>Excel file #2 ...</h1>
-				<select id="LeftSelect#1">
-					<option value="Unset">Не выбрано</option>
-				</select>
-				<select id="LeftSelect#2">
-					<option value="Unset">Не выбрано 2</option>
-				</select>
-				<select id="LeftSelect#3">
-					<option value="Unset">Не выбрано 3</option>
-				</select>
+				<h1>{{ file2.file.name }}</h1>
+				<create-selects
+					v-for="select in Object.keys(file2.table.rows[0])"
+					:options="Object.keys(file2.table.rows[0])"
+					v-bind:key="select"
+				></create-selects>
 			</div>
 		</div>
 		<div class="btnBlock">
@@ -48,7 +37,13 @@
 </template>
 
 <script>
-export default {};
+import { mapGetters } from 'vuex';
+import createSelects from './createSelects.vue';
+export default {
+	components: { createSelects },
+	// берет данные из getters
+	computed: mapGetters(['file1', 'file2']),
+};
 </script>
 
 <style lang="scss">
