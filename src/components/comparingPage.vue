@@ -6,21 +6,24 @@
         <div class="compareParam">
             <div class="leftParams">
                 <h1 v-on:click="rowsInfo()">{{ file1.file.name }}</h1>
-                <!-- <h1>{{ file1.table.rows }}</h1> -->
 
                 <!-- перебор на основе длинны столбцов  -->
                 <create-selects
-                    v-for="select in maxElementsInFiles"
+                    v-for="(select, indexOfSelect) in maxElementsInFiles"
                     :options="Object.keys(file1.table.rows[0])"
-                    v-bind:key="select"
+                    :indexOfSelect="indexOfSelect"
+                    fileNumber="file1"
+                    v-bind:key="'file1' + select"
                 ></create-selects>
             </div>
             <div class="rightParams">
                 <h1>{{ file2.file.name }}</h1>
                 <create-selects
-                    v-for="select in maxElementsInFiles"
+                    v-for="(select, indexOfSelect) in maxElementsInFiles"
                     :options="Object.keys(file2.table.rows[0])"
-                    v-bind:key="select"
+                    :indexOfSelect="indexOfSelect"
+                    fileNumber="file2"
+                    v-bind:key="'file2' + select"
                 ></create-selects>
             </div>
         </div>
@@ -46,13 +49,7 @@ export default {
     components: { createSelects },
     // берет данные из getters
     // приходит 1 файл, 2 файл, максимальное кол-во столбцов среди 2-ух файлов
-    computed: mapGetters(['file1', 'file2', 'maxElementsInFiles']),
-    methods: {
-        rowsInfo() {
-            console.log(this.file1.table.rows);
-            console.log(this.file1.table.rows[0][`${select}`]);
-        },
-    },
+    computed: mapGetters(['file1', 'file2', 'maxElementsInFiles', 'comparedFields']),
 };
 </script>
 

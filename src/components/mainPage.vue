@@ -97,7 +97,7 @@ export default {
         },
         postDataToVuex(fileNumber, rows) {
             // отправка данных в vuex payload (название мутации, объект с данными)
-            this.$store.commit('setFileData', {
+            this.$store.dispatch('loadFileInformation', {
                 fileNumber: fileNumber,
                 newFileData: {
                     file: this.$refs[fileNumber].files[0],

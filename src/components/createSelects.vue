@@ -1,8 +1,8 @@
 <template>
     <li>
-        <select v-model="atribute" v-on:change="optionSubmit">
+        <select v-model="atribute">
             <option value="Unset">Не выбрано</option>
-            <option v-for="option in options" v-bind:key="option">
+            <option v-for="(option, index) in options" v-bind:key="option + index" :value="index">
                 {{ option }}
             </option>
         </select>
@@ -18,14 +18,19 @@ export default {
         };
     },
     computed: mapGetters(['file1', 'file2']),
-    methods: {
-        optionSubmit() {
-            // console.log(this.atribute);
-            // console.log(this.file1.table.rows[0][`${this.option} `]);
+    watch: {
+        atribute() {
+            this.$store.dispatch('selectField', {
+                fileNumber: this.fileNumber,
+                indexOfSelect: this.indexOfSelect,
+                indexOfAtribute: this.atribute,
+            });
         },
     },
     props: {
         options: Array,
+        fileNumber: String,
+        indexOfSelect: Number,
     },
 };
 </script>
