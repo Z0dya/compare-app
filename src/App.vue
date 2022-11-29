@@ -1,9 +1,7 @@
 <template>
-	<div>
-		<transition mode="out-in">
-			<router-view></router-view>
-		</transition>
-	</div>
+	<transition mode="out-in">
+		<router-view></router-view>
+	</transition>
 </template>
 
 <script>
@@ -25,6 +23,13 @@ html {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	color: #1c1c1c;
 }
+
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+}
+
 a {
 	text-decoration: none;
 }
