@@ -23,6 +23,16 @@ export default new Vuex.Store({
             },
         },
         comparedFields: [],
+        compared: {
+            unMatched: '',
+            unMatched2: '',
+            unmatchedHighlight: '',
+            goodAnswer: '',
+            noResults: '',
+            noResults2: '',
+            nameFile1: '',
+            nameFile2: '',
+        },
     },
     // получать состояния из state ()
     getters: {
@@ -31,13 +41,13 @@ export default new Vuex.Store({
             if (state.files.file1.file) {
                 return state.files.file1;
             }
-            router.push('/404');
+            router.push('/');
         },
         file2(state) {
             if (state.files.file1.file) {
                 return state.files.file2;
             }
-            router.push('/404');
+            router.push('/');
         },
         maxElementsInFiles(state) {
             // возвращаем наибольшее кол-во столбцов
@@ -49,6 +59,31 @@ export default new Vuex.Store({
         },
         comparedFields(state) {
             return state.comparedFields;
+        },
+
+        unMatched(state) {
+            return state.compared.unMatched;
+        },
+        unMatched2(state) {
+            return state.compared.unMatched2;
+        },
+        unmatchedHighlight(state) {
+            return state.compared.unmatchedHighlight;
+        },
+        goodAnswer(state) {
+            return state.compared.goodAnswer;
+        },
+        noResults(state) {
+            return state.compared.noResults;
+        },
+        noResults2(state) {
+            return state.compared.noResults2;
+        },
+        nameFile1(state) {
+            return state.compared.nameFile1;
+        },
+        nameFile2(state) {
+            return state.compared.nameFile2;
         },
     },
     // изменение состояний \ присваивание
@@ -69,20 +104,47 @@ export default new Vuex.Store({
             }
         },
         // запись в массив выбранные значения пользователем ( в виде индекса )
-        addToComparedArray(state, { fileNumber, indexOfSelect, indexOfAtribute }) {
+        addToComparedArray(state, { fileNumber, indexOfSelect, valueOfAtribute }) {
             if (fileNumber == 'file1') {
-                if (indexOfAtribute === 'Unset') {
+                if (valueOfAtribute === 'Unset') {
                     state.comparedFields[indexOfSelect][0] = null;
                 } else {
-                    state.comparedFields[indexOfSelect][0] = indexOfAtribute;
+                    state.comparedFields[indexOfSelect][0] = valueOfAtribute;
                 }
             } else {
-                if (indexOfAtribute === 'Unset') {
+                if (valueOfAtribute === 'Unset') {
                     state.comparedFields[indexOfSelect][1] = null;
                 } else {
-                    state.comparedFields[indexOfSelect][1] = indexOfAtribute;
+                    state.comparedFields[indexOfSelect][1] = valueOfAtribute;
                 }
             }
+        },
+        unMatched(state, unmatched) {
+            state.compared.unMatched = unmatched;
+        },
+        unMatched2(state, unmatched2) {
+            state.compared.unMatched2 = unmatched2;
+        },
+        unmatchedHighlight(state, unmatchedHighlight) {
+            state.compared.unmatchedHighlight = unmatchedHighlight;
+        },
+        noResults(state, noResults) {
+            state.compared.noResults = noResults;
+        },
+        goodMatched(state, goodAnswer) {
+            state.compared.goodAnswer = goodAnswer;
+        },
+        noResults(state, noResults) {
+            state.compared.noResults = noResults;
+        },
+        noResults2(state, noResults2) {
+            state.compared.noResults2 = noResults2;
+        },
+        nameFile1(state, nameFile1) {
+            state.compared.nameFile1 = nameFile1;
+        },
+        nameFile2(state, nameFile2) {
+            state.compared.nameFile2 = nameFile2;
         },
     },
     actions: {
@@ -101,6 +163,64 @@ export default new Vuex.Store({
         },
         selectField(context, payload) {
             context.commit('addToComparedArray', payload);
+        },
+        compare(context) {
+            let maxRowsNumber = context.state.files.file1.table.rows.length;
+            if (maxRowsNumber < context.state.files.file2.table.rows.length) {
+                maxRowsNumber = context.state.files.file2.table.rows.length;
+            }
+
+            let isUnmatch = false;
+            context.commit('goodMatched', '');
+
+            for (let i = 0; i < maxRowsNumber; i++) {
+                let unmatchedRows = [];
+                context.state.comparedFields.forEach((element) => {
+                    // если не unset то делаем сравнение
+                    if (element[0] && element[1]) {
+                        const rowFile0 = context.state.files.file1.table.rows[i];
+                        const rowFile1 = context.state.files.file2.table.rows[i];
+                        if (rowFile0 && rowFile1 && String(rowFile0[element[0]]) !== String(rowFile1[element[1]])) {
+                            unmatchedRows.push([rowFile0, rowFile1, element[0], element[1]]);
+                            isUnmatch = true;
+                        }
+                    }
+                });
+                if (unmatchedRows.length === 1) {
+                    for (const unmatchedRow of unmatchedRows) {
+                        // console.log(
+                        let unmatched = String(Object.values(unmatchedRow[0]).join(' | '));
+                        let unmatchedHighlight = ' Частично совпадает c ';
+                        let unmatched2 = String(
+                            Object.values(unmatchedRow[1]).join(' | ') +
+                                '. Обнаружено несовпадение колонки ' +
+                                unmatchedRow[2] +
+                                ' с колонкой  ' +
+                                unmatchedRow[3],
+                        );
+
+                        context.commit('unMatched', unmatched);
+                        context.commit('unMatched2', unmatched2);
+                        context.commit('unmatchedHighlight', unmatchedHighlight);
+                    }
+                } else {
+                    for (const unmatchedRow of unmatchedRows) {
+                        let noResults = Object.values(unmatchedRow[0]).join(' | ');
+                        let nameFile1 = context.state.files.file1.file.name;
+                        let nameFile2 = context.state.files.file2.file.name;
+                        //    nothingInFile
+                        let noResults2 = Object.values(unmatchedRow[1]).join(' | ');
+
+                        context.commit('noResults', noResults);
+                        context.commit('noResults2', noResults2);
+                        context.commit('nameFile1', nameFile1);
+                        context.commit('nameFile2', nameFile2);
+                    }
+                }
+            }
+            if (!isUnmatch) {
+                context.commit('goodMatched', 'Полное совпадение');
+            }
         },
     },
     modules: {},

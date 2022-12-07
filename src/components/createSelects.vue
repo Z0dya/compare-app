@@ -2,7 +2,7 @@
     <li>
         <select v-model="atribute">
             <option value="Unset">Не выбрано</option>
-            <option v-for="(option, index) in options" v-bind:key="option + index" :value="index">
+            <option v-for="option in options" v-bind:key="(option + Math.random())" :value="option">
                 {{ option }}
             </option>
         </select>
@@ -23,7 +23,7 @@ export default {
             this.$store.dispatch('selectField', {
                 fileNumber: this.fileNumber,
                 indexOfSelect: this.indexOfSelect,
-                indexOfAtribute: this.atribute,
+                valueOfAtribute: this.atribute,
             });
         },
     },

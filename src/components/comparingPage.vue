@@ -30,7 +30,7 @@
         <div class="btnBlock">
             <div class="next">
                 <router-link to="/result" class="nextLink">
-                    <button class="nextBtn">Далее</button>
+                    <button class="nextBtn" @click="compareCall">Далее</button>
                 </router-link>
             </div>
             <div class="back">
@@ -47,6 +47,11 @@ import { mapGetters } from 'vuex';
 import createSelects from './createSelects.vue';
 export default {
     components: { createSelects },
+    methods: {
+        compareCall() {
+            this.$store.dispatch('compare');
+        },
+    },
     // берет данные из getters
     // приходит 1 файл, 2 файл, максимальное кол-во столбцов среди 2-ух файлов
     computed: mapGetters(['file1', 'file2', 'maxElementsInFiles', 'comparedFields']),
