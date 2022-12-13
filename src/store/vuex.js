@@ -24,14 +24,11 @@ export default new Vuex.Store({
         },
         comparedFields: [],
         compared: {
-            unMatched: '',
-            unMatched2: '',
-            unmatchedHighlight: '',
             goodAnswer: '',
-            noResults: '',
-            noResults2: '',
-            nameFile1: '',
-            nameFile2: '',
+        },
+        compareResult: {
+            partical: [],
+            absolute: [],
         },
     },
     // получать состояния из state ()
@@ -60,30 +57,11 @@ export default new Vuex.Store({
         comparedFields(state) {
             return state.comparedFields;
         },
-
-        unMatched(state) {
-            return state.compared.unMatched;
-        },
-        unMatched2(state) {
-            return state.compared.unMatched2;
-        },
-        unmatchedHighlight(state) {
-            return state.compared.unmatchedHighlight;
+        compareResult(state) {
+            return state.compareResult;
         },
         goodAnswer(state) {
             return state.compared.goodAnswer;
-        },
-        noResults(state) {
-            return state.compared.noResults;
-        },
-        noResults2(state) {
-            return state.compared.noResults2;
-        },
-        nameFile1(state) {
-            return state.compared.nameFile1;
-        },
-        nameFile2(state) {
-            return state.compared.nameFile2;
         },
     },
     // изменение состояний \ присваивание
@@ -119,32 +97,24 @@ export default new Vuex.Store({
                 }
             }
         },
-        unMatched(state, unmatched) {
-            state.compared.unMatched = unmatched;
-        },
-        unMatched2(state, unmatched2) {
-            state.compared.unMatched2 = unmatched2;
-        },
-        unmatchedHighlight(state, unmatchedHighlight) {
-            state.compared.unmatchedHighlight = unmatchedHighlight;
-        },
-        noResults(state, noResults) {
-            state.compared.noResults = noResults;
-        },
         goodMatched(state, goodAnswer) {
             state.compared.goodAnswer = goodAnswer;
         },
-        noResults(state, noResults) {
-            state.compared.noResults = noResults;
+        addCompareResultPartical(state, payload) {
+            state.compareResult.partical.push({
+                rowInFile0: payload.rowInFile0,
+                rowInFile1: payload.rowInFile1,
+            });
         },
-        noResults2(state, noResults2) {
-            state.compared.noResults2 = noResults2;
+        addCompareResultNotAbsolute(state, payload) {
+            state.compareResult.absolute.push({
+                rowInFile0: payload.rowInFile0,
+                nameOfFile1: payload.nameOfFile1,
+            });
         },
-        nameFile1(state, nameFile1) {
-            state.compared.nameFile1 = nameFile1;
-        },
-        nameFile2(state, nameFile2) {
-            state.compared.nameFile2 = nameFile2;
+        clearCompareResult(state) {
+            state.compareResult.partical = [];
+            state.compareResult.absolute = [];
         },
     },
     actions: {
@@ -165,60 +135,114 @@ export default new Vuex.Store({
             context.commit('addToComparedArray', payload);
         },
         compare(context) {
-            let maxRowsNumber = context.state.files.file1.table.rows.length;
-            if (maxRowsNumber < context.state.files.file2.table.rows.length) {
-                maxRowsNumber = context.state.files.file2.table.rows.length;
-            }
+            context.commit('clearCompareResult');
 
-            let isUnmatch = false;
+            // нахождение максимального количества строк в 2 файлах
+            let maxRowsNumber = Math.max(
+                context.state.files.file1.table.rows.length,
+                context.state.files.file2.table.rows.length,
+            );
+            // нет ни одной ошибки
+            let isAccordance = true;
+            // очищение полного совпадения
             context.commit('goodMatched', '');
 
+            const rowFile0 = context.state.files.file1.table.rows;
+            const rowFile1 = context.state.files.file2.table.rows;
+
+            // перебор строк из первого файла
             for (let i = 0; i < maxRowsNumber; i++) {
-                let unmatchedRows = [];
-                context.state.comparedFields.forEach((element) => {
-                    // если не unset то делаем сравнение
-                    if (element[0] && element[1]) {
-                        const rowFile0 = context.state.files.file1.table.rows[i];
-                        const rowFile1 = context.state.files.file2.table.rows[i];
-                        if (rowFile0 && rowFile1 && String(rowFile0[element[0]]) !== String(rowFile1[element[1]])) {
-                            unmatchedRows.push([rowFile0, rowFile1, element[0], element[1]]);
-                            isUnmatch = true;
+                let unmatchedRows = {};
+                // перебор строк из второго файла
+                for (let j = 0; j < maxRowsNumber; j++) {
+                    // перебор столбцов поочерёдно
+                    context.state.comparedFields.forEach((comparedColumns) => {
+                        // если не unset то делаем сравнение
+                        if (comparedColumns[0] && comparedColumns[1]) {
+                            if (rowFile0[i] && rowFile1[j]) {
+                                /* Структура:
+                                unmachedRows = {
+                                    'номер_строки_первый_файл (i-0)': {
+                                        'номер_строки_второй_файл (j-0)': {}
+                                        'номер_строки_второй_файл (j-1)': {}
+                                        'номер_строки_второй_файл (j-2)': {}
+                                    }
+                                    'номер_строки_первый_файл (i-1)': {
+                                        'номер_строки_второй_файл (j-0)': {}
+                                        'номер_строки_второй_файл (j-1)': {}
+                                        'номер_строки_второй_файл (j-2)': {}
+                                    }
+                                 } */
+
+                                // если в unmatchedRows(строки в файлах) отсутствует поле с номером i,
+                                // то создаём поле i и задаём ему пустой объект
+                                if (!unmatchedRows.hasOwnProperty(i)) {
+                                    unmatchedRows[i] = {};
+                                }
+
+                                // если в unmatchedRows в поле i отсутствует поле с номером j,
+                                // то создаём поле j в поле i и задаём  ему пустой объект
+                                if (unmatchedRows.hasOwnProperty(i) && !unmatchedRows[i].hasOwnProperty(j)) {
+                                    unmatchedRows[i][j] = {};
+                                }
+                                // comparedColumnds - название столбцов которые выбрали в select
+                                if (
+                                    String(rowFile0[i][comparedColumns[0]]) === String(rowFile1[j][comparedColumns[1]])
+                                ) {
+                                    unmatchedRows[i][j][comparedColumns[0]] = true;
+                                    return;
+                                }
+                                unmatchedRows[i][j][comparedColumns[0]] = false;
+                            }
+                        }
+                    });
+                }
+
+                console.log(unmatchedRows);
+
+                // полное совпадение и частичное несовпадение
+                let isAbsoluteCompare = false;
+                let isParticalCompare = false;
+                for (const [key, rowInFile1] of Object.entries(unmatchedRows[i])) {
+                    const countOfColumns = Object.values(rowInFile1).length;
+                    // все столбцы 1 файла фильтруем по true
+                    const compareCount = Object.values(rowInFile1).filter((value) => value === true).length;
+                    // если кол-во столбцов = кол-во столбцов которые совпали
+                    if (countOfColumns === compareCount) {
+                        isAbsoluteCompare = true;
+                        break;
+                        // проверка на то, что колонка только одна иначе отсутсвие true - это гарантированное неполное совпадение
+                    } else if (countOfColumns !== 1) {
+                        // (частичное) если кол-во столбцов -1 = кол-во столбцов которые совпали
+                        if (countOfColumns - 1 === compareCount) {
+                            isParticalCompare = true;
+                            // вызов мутации
+                            context.commit('addCompareResultPartical', {
+                                rowInFile0: rowFile0[i],
+                                rowInFile1: rowFile1[key],
+                            });
+                            break;
                         }
                     }
-                });
-                if (unmatchedRows.length === 1) {
-                    for (const unmatchedRow of unmatchedRows) {
-                        // console.log(
-                        let unmatched = String(Object.values(unmatchedRow[0]).join(' | '));
-                        let unmatchedHighlight = ' Частично совпадает c ';
-                        let unmatched2 = String(
-                            Object.values(unmatchedRow[1]).join(' | ') +
-                                '. Обнаружено несовпадение колонки ' +
-                                unmatchedRow[2] +
-                                ' с колонкой  ' +
-                                unmatchedRow[3],
-                        );
-
-                        context.commit('unMatched', unmatched);
-                        context.commit('unMatched2', unmatched2);
-                        context.commit('unmatchedHighlight', unmatchedHighlight);
-                    }
-                } else {
-                    for (const unmatchedRow of unmatchedRows) {
-                        let noResults = Object.values(unmatchedRow[0]).join(' | ');
-                        let nameFile1 = context.state.files.file1.file.name;
-                        let nameFile2 = context.state.files.file2.file.name;
-                        //    nothingInFile
-                        let noResults2 = Object.values(unmatchedRow[1]).join(' | ');
-
-                        context.commit('noResults', noResults);
-                        context.commit('noResults2', noResults2);
-                        context.commit('nameFile1', nameFile1);
-                        context.commit('nameFile2', nameFile2);
-                    }
+                }
+                // если полное совпадение
+                if (isAbsoluteCompare) {
+                    continue;
+                    // полное НЕСОВПАДЕНИЕ
+                } else if (!isParticalCompare) {
+                    context.commit('addCompareResultNotAbsolute', {
+                        rowInFile0: rowFile0[i],
+                        nameOfFile1: context.state.files.file2.file.name,
+                    });
+                }
+                // если не совпало или частично совпало, то не выводим полное совпадение
+                if (!isAbsoluteCompare || isParticalCompare) {
+                    isAccordance = false;
                 }
             }
-            if (!isUnmatch) {
+
+            // если соотвествует то выводим полное совпадение
+            if (isAccordance) {
                 context.commit('goodMatched', 'Полное совпадение');
             }
         },

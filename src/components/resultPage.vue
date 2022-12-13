@@ -4,28 +4,22 @@
         <div class="box">
             <div class="tableResult">
                 <p class="goodAnswer" v-if="goodAnswer">{{ goodAnswer }}</p>
-                {{ unMatched }}
-                <br />
-                <span class="compareHalf"> {{ unmatchedHighlight }}</span>
-                {{ unMatched2 }}
-                <hr />
-                {{ noResults }}
-                <br />
-                <span class="compareNot" v-if="noResults"> {{ 'Отсутствует в файле:' }}</span>
+                <partical-compare
+                    v-for="partical in compareResult.partical"
+                    :key="Math.random() + partical"
+                    :rowInFile0="partical.rowInFile0"
+                    :rowInFile1="partical.rowInFile1"
+                ></partical-compare>
 
-                {{ nameFile1 }}
-                <br />
-                {{ noResults2 }}
-                <br />
-                <span class="compareNot" v-if="noResults2"> {{ 'Отсутствует в файле:' }}</span>
-                {{ nameFile2 }}
-                <br />
+                <absolute-not-compare
+                    v-for="absolute in compareResult.absolute"
+                    :key="Math.random() + absolute"
+                    :rowInFile0="absolute.rowInFile0"
+                    :nameOfFile1="absolute.nameOfFile1"
+                ></absolute-not-compare>
             </div>
         </div>
         <div class="btnBlock">
-            <div class="download">
-                <button class="downloadBtn">Скачать</button>
-            </div>
             <div class="back">
                 <router-link to="/comparing" class="nextLink">
                     <button class="backBtn">Назад</button>
@@ -37,18 +31,11 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import AbsoluteNotCompare from './absoluteNotCompare.vue';
+import particalCompare from './particalCompare.vue';
 export default {
-    computed: mapGetters([
-        'unMatched',
-        'unMatched2',
-        'unmatchedHighlight',
-        'noResults',
-        'noResults2',
-        'nameFile1',
-        'nameFile2',
-        'goodAnswer',
-        'nameOfMatches',
-    ]),
+    components: { particalCompare, AbsoluteNotCompare },
+    computed: mapGetters(['goodAnswer', 'compareResult']),
 };
 </script>
 
@@ -88,14 +75,9 @@ export default {
     .tableResult {
         @extend %table;
         padding: 2rem 2rem;
+        overflow: scroll;
         .goodAnswer {
             @extend %center-display;
-        }
-        .compareHalf {
-            color: #844aff;
-        }
-        .compareNot {
-            color: #d10c0c;
         }
     }
 }

@@ -28,14 +28,15 @@
             </div>
         </div>
         <div class="btnBlock">
-            <div class="next">
-                <router-link to="/result" class="nextLink">
-                    <button class="nextBtn" @click="compareCall">Далее</button>
-                </router-link>
-            </div>
             <div class="back">
                 <router-link to="/" class="nextLink">
                     <button class="backBtn">Назад</button>
+                </router-link>
+            </div>
+
+            <div class="next">
+                <router-link to="/result" class="nextLink">
+                    <button class="nextBtn" @click="compareCall">Далее</button>
                 </router-link>
             </div>
         </div>
