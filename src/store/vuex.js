@@ -206,7 +206,7 @@ export default new Vuex.Store({
                     });
                 }
 
-                console.log(unmatchedRows);
+                // console.log(unmatchedRows);
 
                 // полное совпадение и частичное несовпадение
                 let isAbsoluteCompare = false;

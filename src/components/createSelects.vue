@@ -1,8 +1,8 @@
 <template>
     <li>
         <select v-model="atribute">
-            <option value="Unset">Не выбрано</option>
-            <option v-for="option in options" v-bind:key="(option + Math.random())" :value="option">
+            <option value="Unset">не выбрано</option>
+            <option v-for="option in options" v-bind:key="option + Math.random()" :value="option">
                 {{ option }}
             </option>
         </select>
@@ -26,6 +26,9 @@ export default {
                 valueOfAtribute: this.atribute,
             });
         },
+        // indexOfSelect() {
+        //     this.atribute = this.options[this.indexOfSelect];
+        // },
     },
     props: {
         options: Array,
