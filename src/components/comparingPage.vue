@@ -13,7 +13,7 @@
                     :options="Object.keys(file1.table.rows[0])"
                     :indexOfSelect="indexOfSelect"
                     fileNumber="file1"
-                    v-bind:key="'file1' + select"
+                    v-bind:key="select.id"
                 ></create-selects>
             </div>
             <div class="rightParams">
@@ -23,7 +23,7 @@
                     :options="Object.keys(file2.table.rows[0])"
                     :indexOfSelect="indexOfSelect"
                     fileNumber="file2"
-                    v-bind:key="'file2' + select"
+                    v-bind:key="select.id"
                 ></create-selects>
             </div>
         </div>

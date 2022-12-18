@@ -47,12 +47,19 @@ export default new Vuex.Store({
             router.push('/');
         },
         maxElementsInFiles(state) {
+            let lengthFile1 = Object.keys(state.files.file1.table.rows[0]);
+            let lengthFile2 = Object.keys(state.files.file2.table.rows[0]);
             // возвращаем наибольшее кол-во столбцов
-            // если кол-во столбцов в 1 файле больше чем во 2, то возвращаем кол-во 1 файла иначе наоборот
-            if (Object.keys(state.files.file1.table.rows[0]) > Object.keys(state.files.file2.table.rows[0])) {
-                return Object.keys(state.files.file1.table.rows[0]);
+            // если в 1 и во 2 файле длинна больше 5, то мы приравниваем длинну к 5
+            if (lengthFile1.length > 5 || lengthFile2.length > 5) {
+                return (lengthFile1.length = 5), (lengthFile2.length = 5);
             }
-            return Object.keys(state.files.file2.table.rows[0]);
+            // если кол-во столбцов в 1 файле больше чем во 2, то возвращаем кол-во 1 файла иначе наоборот
+            if (lengthFile1 > lengthFile2) {
+                return lengthFile1;
+            } else {
+                return lengthFile2;
+            }
         },
         comparedFields(state) {
             return state.comparedFields;
@@ -142,6 +149,7 @@ export default new Vuex.Store({
                 context.state.files.file1.table.rows.length,
                 context.state.files.file2.table.rows.length,
             );
+
             // нет ни одной ошибки
             let isAccordance = true;
             // очищение полного совпадения
