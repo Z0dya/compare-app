@@ -129,31 +129,39 @@ export default {
     color: #ffff;
     margin: 7rem 0;
 }
+%continue {
+    border-radius: 5rem;
+    border: none;
+    width: 25.5rem;
+    height: 7rem;
+    font-size: 4rem;
+    color: #ffff;
+    margin: 7rem 0;
+}
 
 .container {
     margin-top: 5rem;
-}
-
-.imgBlock {
-    @extend %center-display;
-}
-.btnBlock {
-    @extend %center-display;
-    gap: 8.5rem;
-
-    .firstBtn {
-        cursor: pointer;
-        height: 3rem;
-        padding: 2rem 2rem;
-        @extend %buttons-styles;
-        background-color: #2d96ed;
+    .imgBlock {
+        @extend %center-display;
     }
-    .secondBtn {
-        cursor: pointer;
-        height: 3rem;
-        padding: 2rem 2rem;
-        @extend %buttons-styles;
-        background-color: #46cc6b;
+    .btnBlock {
+        @extend %center-display;
+        gap: 8.5rem;
+
+        .firstBtn {
+            cursor: pointer;
+            height: 3rem;
+            padding: 2rem 2rem;
+            @extend %buttons-styles;
+            background-color: #2d96ed;
+        }
+        .secondBtn {
+            cursor: pointer;
+            height: 3rem;
+            padding: 2rem 2rem;
+            @extend %buttons-styles;
+            background-color: #46cc6b;
+        }
     }
 }
 
@@ -163,9 +171,8 @@ export default {
         width: fit-content;
         height: fit-content;
         .nextBtn {
-            @extend %buttons-styles;
+            @extend %continue;
             margin: 0;
-            font-size: 4rem;
             cursor: pointer;
             background: rgba(43, 43, 43);
             transition: all 0.5s ease;
@@ -225,6 +232,33 @@ export default {
     100% {
         -webkit-transform: rotate(-1turn);
         transform: rotate(-1turn);
+    }
+}
+
+// адаптивный дизайн
+@media (max-height: 740px) {
+    .imgBlock img {
+        width: 20rem;
+    }
+
+    %continue {
+        border-radius: 5rem;
+        border: none;
+        width: 20.5rem;
+        height: 6rem;
+        font-size: 3rem;
+        color: #ffff;
+        margin: 0;
+    }
+
+    %buttons-styles {
+        border-radius: 5rem;
+        border: none;
+        width: 35.5rem;
+        height: 3rem;
+        font-size: 2rem;
+        color: #ffff;
+        margin: 5rem 0;
     }
 }
 </style>
