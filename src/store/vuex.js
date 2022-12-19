@@ -34,7 +34,7 @@ export default new Vuex.Store({
     // получать состояния из state ()
     getters: {
         file1(state) {
-            // если true то вернуть file1 иначе переадресация на 404
+            // если true то вернуть file1 иначе переадресация на 1 страницу (2 страница)
             if (state.files.file1.file) {
                 return state.files.file1;
             }
@@ -46,6 +46,14 @@ export default new Vuex.Store({
             }
             router.push('/');
         },
+        // если true то вернуть file1 иначе переадресация на 1 страницу (3 страница)
+        compared(state) {
+            if (state.compared.goodAnswer && state.compare.compareResult.partical && state.compareResult.absolute) {
+                return state.compared.goodAnswer, state.compare.compareResult.partical, state.compareResult.absolute;
+            }
+            router.push('/');
+        },
+
         maxElementsInFiles(state) {
             let lengthFile1 = Object.keys(state.files.file1.table.rows[0]);
             let lengthFile2 = Object.keys(state.files.file2.table.rows[0]);
