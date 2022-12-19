@@ -45,18 +45,7 @@ export default {
     justify-content: center;
     align-items: center;
 }
-%buttons-styles {
-    border-radius: 5rem;
-    border: none;
-    width: 35.5rem;
-    height: 7rem;
-    font-size: 2rem;
-    color: #ffff;
-    margin: 7rem 0;
-    cursor: pointer;
-    transition: all 0.5s ease;
-    font-size: 3rem;
-}
+
 %table {
     width: 111rem;
     height: 60rem;
@@ -81,15 +70,96 @@ export default {
         }
     }
 }
+.btnBlock {
+    .back {
+        .backBtn {
+            @extend %buttons-styles;
+            background-color: #844aff;
+        }
 
-.download {
-    .downloadBtn {
-        @extend %buttons-styles;
-        background-color: #0fbe3f;
-        transition: all 0.5s ease;
+        .backBtn:hover {
+            background: rgba(132, 74, 255, 0.8);
+        }
     }
-    .downloadBtn:hover {
-        background: rgba(15, 190, 63, 0.8);
+}
+
+// адаптивный дизайн
+@media (max-height: 800px) {
+    %table {
+        width: 85rem;
+        height: 50rem;
+        border-radius: 5rem;
+        border: none;
+        background-color: #2b2b2b;
+        color: #ffffff;
+        font-size: 3rem;
+    }
+    %buttons-styles {
+        border-radius: 5rem;
+        border: none;
+        width: 25.5rem;
+        height: 5rem;
+        color: #ffff;
+        margin: 7rem 0;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        font-size: 3rem;
+    }
+
+    .btnBlock {
+        height: 10rem;
+    }
+}
+@media (max-width: 1180px) {
+    %table {
+        width: 85rem;
+        height: 50rem;
+        border-radius: 5rem;
+        border: none;
+        background-color: #2b2b2b;
+        color: #ffffff;
+        font-size: 3rem;
+    }
+    %buttons-styles {
+        border-radius: 5rem;
+        border: none;
+        width: 25.5rem;
+        height: 5rem;
+        color: #ffff;
+        margin: 7rem 0;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        font-size: 3rem;
+    }
+
+    .btnBlock {
+        height: 10rem;
+    }
+}
+@media (max-height: 700px) {
+    %table {
+        width: 85rem;
+        height: 40rem;
+        border-radius: 5rem;
+        border: none;
+        background-color: #2b2b2b;
+        color: #ffffff;
+        font-size: 3rem;
+    }
+    %buttons-styles {
+        border-radius: 5rem;
+        border: none;
+        width: 25.5rem;
+        height: 5rem;
+        color: #ffff;
+        margin: 7rem 0;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        font-size: 3rem;
+    }
+
+    .btnBlock {
+        height: 10rem;
     }
 }
 </style>

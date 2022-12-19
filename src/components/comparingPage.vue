@@ -155,4 +155,25 @@ export default {
         }
     }
 }
+
+// адаптивный дизайн
+@media (max-height: 760px) {
+    .imgBlock img {
+        width: 20rem;
+    }
+
+    %buttons-styles {
+        border-radius: 5rem;
+        border: none;
+        width: 20.5rem;
+        height: 4.5rem;
+        font-size: 3rem;
+        color: #ffff;
+        margin: 5rem 0;
+    }
+    .btnBlock{
+        justify-content: space-around;
+        height: 10rem;
+    }
+}
 </style>
