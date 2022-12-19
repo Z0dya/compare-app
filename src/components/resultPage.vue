@@ -35,7 +35,7 @@ import AbsoluteNotCompare from './absoluteNotCompare.vue';
 import particalCompare from './particalCompare.vue';
 export default {
     components: { particalCompare, AbsoluteNotCompare },
-    computed: mapGetters(['goodAnswer', 'compareResult']),
+    computed: mapGetters(['goodAnswer', 'compareResult', 'compared']),
 };
 </script>
 
