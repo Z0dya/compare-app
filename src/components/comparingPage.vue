@@ -50,7 +50,8 @@ export default {
     components: { createSelects },
     methods: {
         compareCall() {
-            this.$store.dispatch('compare');
+            this.$store.state.loaderStatus = true;
+            // this.$store.dispatch('compare');
         },
     },
     // берет данные из getters
@@ -171,7 +172,7 @@ export default {
         color: #ffff;
         margin: 5rem 0;
     }
-    .btnBlock{
+    .btnBlock {
         justify-content: space-around;
         height: 10rem;
     }

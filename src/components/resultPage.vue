@@ -1,29 +1,32 @@
 <template>
-    <div class="container">
-        <h1 class="title">Результат сравнения:</h1>
-        <div class="box">
-            <div class="tableResult">
-                <p class="goodAnswer" v-if="goodAnswer">{{ goodAnswer }}</p>
-                <partical-compare
-                    v-for="partical in compareResult.partical"
-                    :key="Math.random() + partical"
-                    :rowInFile0="partical.rowInFile0"
-                    :rowInFile1="partical.rowInFile1"
-                ></partical-compare>
+    <div>
+        <loader v-if="loaderStatus"></loader>
+        <div class="container" v-else>
+            <h1 class="title">Результат сравнения:</h1>
+            <div class="box">
+                <div class="tableResult">
+                    <p class="goodAnswer" v-if="goodAnswer">{{ goodAnswer }}</p>
+                    <partical-compare
+                        v-for="partical in compareResult.partical"
+                        :key="Math.random() + partical"
+                        :rowInFile0="partical.rowInFile0"
+                        :rowInFile1="partical.rowInFile1"
+                    ></partical-compare>
 
-                <absolute-not-compare
-                    v-for="absolute in compareResult.absolute"
-                    :key="Math.random() + absolute"
-                    :rowInFile0="absolute.rowInFile0"
-                    :nameOfFile1="absolute.nameOfFile1"
-                ></absolute-not-compare>
+                    <absolute-not-compare
+                        v-for="absolute in compareResult.absolute"
+                        :key="Math.random() + absolute"
+                        :rowInFile0="absolute.rowInFile0"
+                        :nameOfFile1="absolute.nameOfFile1"
+                    ></absolute-not-compare>
+                </div>
             </div>
-        </div>
-        <div class="btnBlock">
-            <div class="back">
-                <router-link to="/comparing" class="nextLink">
-                    <button class="backBtn">Назад</button>
-                </router-link>
+            <div class="btnBlock">
+                <div class="back">
+                    <router-link to="/comparing" class="nextLink">
+                        <button class="backBtn">Назад</button>
+                    </router-link>
+                </div>
             </div>
         </div>
     </div>
@@ -32,10 +35,22 @@
 <script>
 import { mapGetters } from 'vuex';
 import AbsoluteNotCompare from './absoluteNotCompare.vue';
+import Loader from './loader.vue';
 import particalCompare from './particalCompare.vue';
 export default {
-    components: { particalCompare, AbsoluteNotCompare },
-    computed: mapGetters(['goodAnswer', 'compareResult', 'compared']),
+    data() {
+        return {
+            isNotUpdate: true,
+        };
+    },
+    components: { particalCompare, AbsoluteNotCompare, Loader },
+    computed: mapGetters(['goodAnswer', 'compareResult', 'compared', 'loaderStatus']),
+    mounted() {
+        // if (this.isNotUpdate) {
+        this.$store.dispatch('compare');
+
+        // }
+    },
 };
 </script>
 

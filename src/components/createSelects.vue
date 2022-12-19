@@ -14,7 +14,7 @@ import { mapGetters } from 'vuex';
 export default {
     data() {
         return {
-            atribute: 'Unset',
+            atribute: '',
         };
     },
     computed: mapGetters(['file1', 'file2']),
@@ -26,14 +26,19 @@ export default {
                 valueOfAtribute: this.atribute,
             });
         },
-        // indexOfSelect() {
-        //     this.atribute = this.options[this.indexOfSelect];
-        // },
     },
     props: {
         options: Array,
         fileNumber: String,
         indexOfSelect: Number,
+    },
+    mounted() {
+        if (this.options[this.indexOfSelect] !== undefined) {
+            this.atribute = this.options[this.indexOfSelect];
+        } else {
+            this.atribute = 'Unset';
+        }
+        
     },
 };
 </script>

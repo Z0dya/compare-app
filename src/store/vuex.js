@@ -23,16 +23,19 @@ export default new Vuex.Store({
             },
         },
         comparedFields: [],
-        compared: {
-            goodAnswer: '',
-        },
+        goodAnswer: '',
         compareResult: {
             partical: [],
             absolute: [],
         },
+        findedRows: [],
+        loaderStatus: false,
     },
     // получать состояния из state ()
     getters: {
+        loaderStatus(state) {
+            return state.loaderStatus;
+        },
         file1(state) {
             // если true то вернуть file1 иначе переадресация на 1 страницу (2 страница)
             if (state.files.file1.file) {
@@ -48,10 +51,12 @@ export default new Vuex.Store({
         },
         // если true то вернуть file1 иначе переадресация на 1 страницу (3 страница)
         compared(state) {
-            if (state.compared.goodAnswer && state.compare.compareResult.partical && state.compareResult.absolute) {
-                return state.compared.goodAnswer, state.compare.compareResult.partical, state.compareResult.absolute;
+            if (!state.loaderStatus) {
+                if (state.files.file1.file && state.files.file2.file) {
+                    return state.goodAnswer, state.compare.compareResult.partical, state.compareResult.absolute;
+                }
+                router.push('/');
             }
-            router.push('/');
         },
 
         maxElementsInFiles(state) {
@@ -76,7 +81,7 @@ export default new Vuex.Store({
             return state.compareResult;
         },
         goodAnswer(state) {
-            return state.compared.goodAnswer;
+            return state.goodAnswer;
         },
     },
     // изменение состояний \ присваивание
@@ -113,7 +118,7 @@ export default new Vuex.Store({
             }
         },
         goodMatched(state, goodAnswer) {
-            state.compared.goodAnswer = goodAnswer;
+            state.goodAnswer = goodAnswer;
         },
         addCompareResultPartical(state, payload) {
             state.compareResult.partical.push({
@@ -150,6 +155,7 @@ export default new Vuex.Store({
             context.commit('addToComparedArray', payload);
         },
         compare(context) {
+            console.log('START');
             context.commit('clearCompareResult');
 
             // нахождение максимального количества строк в 2 файлах
@@ -157,26 +163,24 @@ export default new Vuex.Store({
                 context.state.files.file1.table.rows.length,
                 context.state.files.file2.table.rows.length,
             );
-
             // нет ни одной ошибки
             let isAccordance = true;
             // очищение полного совпадения
             context.commit('goodMatched', '');
-
             const rowFile0 = context.state.files.file1.table.rows;
             const rowFile1 = context.state.files.file2.table.rows;
-
             // перебор строк из первого файла
             for (let i = 0; i < maxRowsNumber; i++) {
                 let unmatchedRows = {};
                 // перебор строк из второго файла
                 for (let j = 0; j < maxRowsNumber; j++) {
-                    // перебор столбцов поочерёдно
-                    context.state.comparedFields.forEach((comparedColumns) => {
-                        // если не unset то делаем сравнение
-                        if (comparedColumns[0] && comparedColumns[1]) {
-                            if (rowFile0[i] && rowFile1[j]) {
-                                /* Структура:
+                    if (!context.state.findedRows.includes(j)) {
+                        // перебор столбцов поочерёдно
+                        context.state.comparedFields.forEach((comparedColumns) => {
+                            // если не unset то делаем сравнение
+                            if (comparedColumns[0] && comparedColumns[1]) {
+                                if (rowFile0[i] && rowFile1[j]) {
+                                    /* Структура:
                                 unmachedRows = {
                                     'номер_строки_первый_файл (i-0)': {
                                         'номер_строки_второй_файл (j-0)': {}
@@ -189,35 +193,36 @@ export default new Vuex.Store({
                                         'номер_строки_второй_файл (j-2)': {}
                                     }
                                  } */
-
-                                // если в unmatchedRows(строки в файлах) отсутствует поле с номером i,
-                                // то создаём поле i и задаём ему пустой объект
-                                if (!unmatchedRows.hasOwnProperty(i)) {
-                                    unmatchedRows[i] = {};
+                                    // если в unmatchedRows(строки в файлах) отсутствует поле с номером i,
+                                    // то создаём поле i и задаём ему пустой объект
+                                    if (!unmatchedRows.hasOwnProperty(i)) {
+                                        unmatchedRows[i] = {};
+                                    }
+                                    // если в unmatchedRows в поле i отсутствует поле с номером j,
+                                    // то создаём поле j в поле i и задаём  ему пустой объект
+                                    if (unmatchedRows.hasOwnProperty(i) && !unmatchedRows[i].hasOwnProperty(j)) {
+                                        unmatchedRows[i][j] = {};
+                                    }
+                                    // comparedColumnds - название столбцов которые выбрали в select
+                                    if (
+                                        String(rowFile0[i][comparedColumns[0]]) ===
+                                        String(rowFile1[j][comparedColumns[1]])
+                                    ) {
+                                        unmatchedRows[i][j][comparedColumns[0]] = true;
+                                        return;
+                                    }
+                                    unmatchedRows[i][j][comparedColumns[0]] = false;
                                 }
-
-                                // если в unmatchedRows в поле i отсутствует поле с номером j,
-                                // то создаём поле j в поле i и задаём  ему пустой объект
-                                if (unmatchedRows.hasOwnProperty(i) && !unmatchedRows[i].hasOwnProperty(j)) {
-                                    unmatchedRows[i][j] = {};
-                                }
-                                // comparedColumnds - название столбцов которые выбрали в select
-                                if (
-                                    String(rowFile0[i][comparedColumns[0]]) === String(rowFile1[j][comparedColumns[1]])
-                                ) {
-                                    unmatchedRows[i][j][comparedColumns[0]] = true;
-                                    return;
-                                }
-                                unmatchedRows[i][j][comparedColumns[0]] = false;
                             }
-                        }
-                    });
+                        });
+                    }
                 }
-
                 // console.log(unmatchedRows);
 
                 // полное совпадение и частичное несовпадение
                 let isAbsoluteCompare = false;
+                let indexAbsoluteComparedRow;
+
                 let isParticalCompare = false;
                 for (const [key, rowInFile1] of Object.entries(unmatchedRows[i])) {
                     const countOfColumns = Object.values(rowInFile1).length;
@@ -226,6 +231,7 @@ export default new Vuex.Store({
                     // если кол-во столбцов = кол-во столбцов которые совпали
                     if (countOfColumns === compareCount) {
                         isAbsoluteCompare = true;
+                        indexAbsoluteComparedRow = key;
                         break;
                         // проверка на то, что колонка только одна иначе отсутсвие true - это гарантированное неполное совпадение
                     } else if (countOfColumns !== 1) {
@@ -243,6 +249,7 @@ export default new Vuex.Store({
                 }
                 // если полное совпадение
                 if (isAbsoluteCompare) {
+                    context.state.findedRows.push(Number(indexAbsoluteComparedRow));
                     continue;
                     // полное НЕСОВПАДЕНИЕ
                 } else if (!isParticalCompare) {
@@ -261,6 +268,8 @@ export default new Vuex.Store({
             if (isAccordance) {
                 context.commit('goodMatched', 'Полное совпадение');
             }
+            context.state.loaderStatus = false;
+            console.log('END');
         },
     },
     modules: {},
