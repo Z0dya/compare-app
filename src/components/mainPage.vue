@@ -4,22 +4,32 @@
             <img src="../assets/ab-testing 1.svg" alt="compareLogo" />
         </div>
         <div class="btnBlock">
-            <input
-                type="file"
-                class="firstBtn"
-                placeholder="Загрузить 1 файл"
-                ref="file1"
-                @change="upload1"
-                :accept="AvailableFormats"
-            />
-            <input
-                type="file"
-                class="secondBtn"
-                placeholder="Загрузить 2 файл"
-                ref="file2"
-                @change="upload2"
-                :accept="AvailableFormats"
-            />
+            <label class="firstBtn" for="input1">
+                <input
+                    type="file"
+                    class="inputs"
+                    placeholder="Загрузить 1 файл"
+                    ref="file1"
+                    @change="upload1"
+                    :accept="AvailableFormats"
+                    id="input1"
+                />
+                <span v-if="file1Name">{{ file1Name }}</span>
+                <span v-else>Выберите файл 1</span>
+            </label>
+            <label class="secondBtn" for="input2">
+                <input
+                    type="file"
+                    class="inputs"
+                    placeholder="Загрузить 2 файл"
+                    ref="file2"
+                    @change="upload2"
+                    :accept="AvailableFormats"
+                    id="input2"
+                />
+                <span v-if="file2Name">{{ file2Name }}</span>
+                <span v-else>Выберите файл 2</span>
+            </label>
         </div>
 
         <div class="nextPage">
@@ -41,8 +51,9 @@
 
 <script>
 import { read, utils } from 'xlsx';
-
+import { mapGetters } from 'vuex';
 export default {
+    computed: mapGetters(['file1Name', 'file2Name']),
     name: 'App',
     data: function () {
         return {
@@ -125,7 +136,7 @@ export default {
     border: none;
     width: 35.5rem;
     height: 7rem;
-    font-size: 2rem;
+    font-size: 3.5rem;
     color: #ffff;
     margin: 7rem 0;
 }
@@ -149,6 +160,7 @@ export default {
         gap: 8.5rem;
 
         .firstBtn {
+            @extend %center-display;
             cursor: pointer;
             height: 3rem;
             padding: 2rem 2rem;
@@ -156,6 +168,7 @@ export default {
             background-color: #2d96ed;
         }
         .secondBtn {
+            @extend %center-display;
             cursor: pointer;
             height: 3rem;
             padding: 2rem 2rem;
@@ -165,6 +178,13 @@ export default {
     }
 }
 
+.inputs {
+    display: none;
+}
+
+span {
+    padding-bottom: 0.5rem;
+}
 .nextPage {
     @extend %center-display;
     .nextLink {
