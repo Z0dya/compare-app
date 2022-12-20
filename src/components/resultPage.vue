@@ -148,7 +148,7 @@ export default {
     }
 
     .btnBlock {
-        height: 10rem;
+        height: 14rem;
     }
 }
 @media (max-height: 700px) {

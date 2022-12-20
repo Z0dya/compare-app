@@ -174,7 +174,7 @@ export default {
     }
     .btnBlock {
         justify-content: space-around;
-        height: 10rem;
+        height: 12rem;
     }
 }
 </style>

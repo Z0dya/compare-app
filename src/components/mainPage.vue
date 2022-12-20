@@ -276,7 +276,7 @@ span {
         border: none;
         width: 35.5rem;
         height: 3rem;
-        font-size: 2rem;
+        font-size: 3rem;
         color: #ffff;
         margin: 5rem 0;
     }
