@@ -36,6 +36,17 @@ export default new Vuex.Store({
         loaderStatus(state) {
             return state.loaderStatus;
         },
+        file1Name(state) {
+            // если true то вернуть file1 иначе переадресация на 1 страницу (2 страница)
+            if (state.files.file1.file) {
+                return state.files.file1.file.name;
+            }
+        },
+        file2Name(state) {
+            if (state.files.file2.file) {
+                return state.files.file2.file.name;
+            }
+        },
         file1(state) {
             // если true то вернуть file1 иначе переадресация на 1 страницу (2 страница)
             if (state.files.file1.file) {
@@ -205,8 +216,8 @@ export default new Vuex.Store({
                                     }
                                     // comparedColumnds - название столбцов которые выбрали в select
                                     if (
-                                        String(rowFile0[i][comparedColumns[0]]) ===
-                                        String(rowFile1[j][comparedColumns[1]])
+                                        String(rowFile0[i][comparedColumns[0]]).trim() ===
+                                        String(rowFile1[j][comparedColumns[1]]).trim()
                                     ) {
                                         unmatchedRows[i][j][comparedColumns[0]] = true;
                                         return;
